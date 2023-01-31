@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Generador URLs</title>
+    <style>
+        body{
+            font-family: "Century Gothic";
+
+            background-color: #F8F1EC;
+        }
+
+        .cabecera {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .generador-container{
+            min-height: 30vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        #input {
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            width: 30%;
+            text-align: center;
+            font-family: "Century Gothic";
+
+        }
+
+        #boton {
+            padding: 1rem 2rem;
+            border-radius: 30px;
+
+            text-align: center;
+            font-family: "Century Gothic";
+            background-color: #fcc42c;
+            color: white;
+            border: 2px solid white;
+            transition: .2s;
+        }
+
+        #boton:hover{
+            background-color: white;
+            border : 2px solid #fcc42c;
+            cursor: pointer;
+            color: #fcc42c;
+            text-decoration: underline;
+            transform: scale(1.05);
+        }
+
+        #enlace{
+            text-decoration: none;
+            color: black;
+            transition: .2s;
+        }
+
+        #enlace:hover{
+            text-decoration: underline;
+            transform: scale(1.05);
+        }
+
+    </style>
+    
+</head>
+<body>
+    <head>
+        <section class="cabecera">
+            <h2>Generador de URLs</h2>
+
+        </section>
+    </head>
+    <main>
+        <section class="generador-container">
+            <label for="input">Escribe tu texto y transformalo en URL</label>
+            <input id="input" type="text">
+            <button id="boton">Generar</button>
+            <a href="#" id="enlace"><h2 id="resultado"></h2></a>
+
+        </section>
+    </main>
+    <script>
+        // Crea una serie de funciones, usando pipe, para transformar textos a URLs válidas.
+        // Elimina acentos, sustituye espacios por guiones, mayúsculas,
+        // concadena [https://ejemplo.com](https://ejemplo.com) al inicio y un / al final.
+        //
+        // Ejemplos:
+        //
+        //     "un dia con mucho viento" -> "https://ejemplo.com/un-dia-con-mucho-viento/"
+        // "Había una vez" -> "https://ejemplo.com/habia-una-vez/"
+
+        //Variables
+            // Input text del usuario
+        const inputHTML = document.querySelector("#input");
+            // Boton para llamar a la funcion
+        const botonHTML = document.querySelector("#boton");
+            // Texto resultado a mostrar
+        const resultadoHTML = document.querySelector("#resultado");
+
+        // Mi dominio
+        const MI_DOMINIO = "https://andros-mola.com";
+
+        // Funciones
+
+        // Generar URL valida
+        function generarURL(){
+            // Capturamos el interior del input, lo pasamos por trim() para quitar posibles espacios
+            let result = inputHTML.value.trim();
+
+            // Quitamos las mayusculas
+             result= cambiarAMinusculas(result);
+
+             // Quitamos acentos
+            result = quitarAcentos(result);
+
+            // Sustituimos espacios por guiones
+            result = cambiarEspacios(result);
+
+            // Anyadir dominio
+            result = anyadirDominio(result);
+
+            resultadoHTML.textContent = result;
+        }
+            // Funcion para bajar a minusculas un texto
+        function cambiarAMinusculas(texto){
+            return texto.toLowerCase();
+        }
+
+            // Funcion para quitar los acentos de una palabra
+        function quitarAcentos(texto){
+
+            let result = texto;
+
+            // Creamos un mapa de los valores de las vocales con acentos y caracteres raros
+            const mapaAcentos = [
+                    /[áàäâã]/g, /[éèëê]/g, /[íìïî]/g, /[óòöôõ]/g, /[úùüû]/g
+            ];
+
+            // Creamos un mapa de los valores de las vocales sin acentos
+            const mapaSinAcentos = ['a', 'e', 'i', 'o', 'u'];
+
+
+            // Aquí la parte liosa
+                // Tenemos el array mapa con los acentos
+                // La idea es, que para cada grupo de vocales, lo sustituya con el la vocal sin acento
+            mapaAcentos.forEach((acento, i) => {
+                result = result.replace(acento, mapaSinAcentos[i]);
+            });
+
+            return result;
+        }
+        // En esta funcion cambiamos los espacios de una string por guiones
+        function cambiarEspacios(texto){
+            let result = texto;
+            // Reemplazamos todos los espacios por guiones
+            result = result.replaceAll(" ","-");
+
+            return result;
+        }
+
+        // En esta funcion añadimos nuestro dominio al texto que nos pasan
+        function anyadirDominio(texto){
+            let result = texto;
+            result= `${MI_DOMINIO}/${result}/`
+
+            return result;
+        }
+
+        // Funcion que llama a la funcion de general URL cuando el usuario pulsa enter
+        function userPulsaIntro(evento){
+            if(evento.code == 'Enter'){
+                generarURL();
+            }
+        }
+
+        // Copiamos el texto resultado(la URL final) al portapapeles
+        function copiarAlPortapapeles(){
+            navigator.clipboard.writeText(resultadoHTML.textContent);
+            alert("URL copiada ");
+
+        }
+
+        // Eventos
+
+            // Eventos para transformar la url
+        botonHTML.addEventListener("click", generarURL);
+        inputHTML.addEventListener("keydown", userPulsaIntro);
+
+            // Si se pulsa el enlace, lo copiamos para que el usuario haga lo que quiera
+        resultadoHTML.addEventListener("click", copiarAlPortapapeles);
+
+        // Inicio
+            // Le damos el foco al input
+        inputHTML.focus();
+    </script>
+</body>
+</html>
